@@ -1,3 +1,4 @@
+#Scenario 2: spatial pattern driven by cell number
 kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
   set.seed(103)
   aresult<-matrix(rep(0,(l^2)),nrow=l,ncol=l)
@@ -38,7 +39,7 @@ kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
   #nresult is cell number of each spot
   nresult<-matrix(as.numeric(cresult[1,]),nrow=2*x-1,ncol=2*x-1,byrow=T)
 
-  #pattern on cell number  
+  # embedd pattern into background  
   aresult[y1,y2]<-nresult[x,x]
   for (i in (0:min(c((y1-1),(x-1))))){
     aresult[y1-i,y2]<-nresult[x-i,x]
