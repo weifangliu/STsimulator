@@ -61,7 +61,29 @@ num1<-rpois(n=uniform,lambda=highden1) #uniform high
 num2<-rpois(n=uniform,lambda=lowden1)  #uniform low
 num3<-rpois(n=sparse,lambda=highden2)  #sparse high
 num4<-rpois(n=sparse,lambda=lowden2)   #sparse low
-  
+
+  blank1<-matrix(c(rep(0,d)),ncol=1)
+for (i in 1:d){
+  blank1[loc1[i]]<-num1[i]
+}
+
+blank2<-matrix(c(rep(0,d)),ncol=1)
+for (i in 1:d){
+  blank2[loc1[i]]<-num2[i]
+}
+
+blank3<-matrix(c(rep(0,d)),ncol=1)
+for (i in 1:d){
+  blank3[loc2[i]]<-num3[i]
+}
+
+blank4<-matrix(c(rep(0,d)),ncol=1)
+for (i in 1:d){
+  blank4[loc2[i]]<-num4[i]
+ }
+return(list(blank1,blank2,blank3,blank4))
+}
+
 ld<-kernallode(400)
 
 sum(ld[[1]]) #947 type A cell number in total
