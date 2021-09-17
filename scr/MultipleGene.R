@@ -38,6 +38,53 @@ typef<-t(type)
   return(typef)
 }
 
+
+#define distribution of locations and density
+set.seed(42)
+kernallode<-function(d){
+uniform<-round(rgamma(n=1, shape=(d*0.8)/((d/0.3)/(d*0.8)), scale=(d/0.3)/(d*0.8)))
+sparse<-round(rgamma(n=1, shape=(d*0.1)/((d/0.3)/(d*0.1)), scale=(d/0.3)/(d*0.1)))
+
+#define distribution of density
+highden1<-round(rgamma(n=uniform, shape=2.5, scale=1))
+highden2<-round(rgamma(n=sparse, shape=2.5, scale=1))
+
+lowden1<-round(rgamma(n=uniform, shape=0.8, scale=1))
+lowden2<-round(rgamma(n=sparse, shape=0.8, scale=1))
+
+#fix number location with cells out of all locations
+loc1<-sort(sample(d,uniform,replace=F))
+loc2<-sort(sample(d,sparse,replace=F))
+
+#define cell number on locations
+num1<-rpois(n=uniform,lambda=highden1) #uniform high
+num2<-rpois(n=uniform,lambda=lowden1)  #uniform low
+num3<-rpois(n=sparse,lambda=highden2)  #sparse high
+num4<-rpois(n=sparse,lambda=lowden2)   #sparse low
+  
+ld<-kernallode(400)
+
+sum(ld[[1]]) #947 type A cell number in total
+sum(ld[[2]]) #342 type B cell number in total
+sum(ld[[3]]) #20 type C cell number in total
+sum(ld[[4]]) #6 type D cell number in total
+ 
+cellnum<-data.frame(xaxis=rep(1:20,20), yaxis=rep(1:20,each=20))
+n<-nrow(cellnum)
+cellnum$region <- factor(1:n)
+cellnum$A <- as.numeric(ld[[1]])
+cellnum$B <- as.numeric(ld[[2]])
+cellnum$C <- as.numeric(ld[[3]])
+cellnum$D <- as.numeric(ld[[4]])
+cellnum$radius<- 0.31
+#colnames(cellnum)[3+(1:length(num))]<-letters[1:length(num)]
+
+p <- ggplot() + geom_scatterpie(aes(x=xaxis, y=yaxis, group=region, r=radius), data=cellnum,
+                                cols=LETTERS[1:4], color=NA) + coord_equal()
+p + geom_scatterpie_legend(cellnum$radius, x=0, y=0)
+
+  
+#jiawen simulation  
 #mean function jiawen A type
 mean<-matrix(rep(0,500),ncol=1)
 for (i in 1:500){
