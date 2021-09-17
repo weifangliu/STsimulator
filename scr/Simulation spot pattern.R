@@ -1,3 +1,4 @@
+#spot-level pattern 
 #start
 library(RColorBrewer)
 library(gplots)
@@ -152,7 +153,9 @@ kernal3<-function(y1,y2,n,sz,l,base){
 }
 k13<-kernal3(10,20,100,10,65,50)
 
-#pattern on averge gene expression 
+
+
+#Scenario 1: pattern on averge gene expression 
 kernalsvg<-function(y1,y2,x,k,r,n,l,num){
   set.seed(103)
   aresult<-matrix(rep(0,(l^2)),nrow=l,ncol=l)
