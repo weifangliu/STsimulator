@@ -69,17 +69,8 @@ kernalv1<-function(y1,y2,x,k,r,n,mn1,mn2,v1,v2,l){
       aresult[y1+s,y2+t]<-dresult[x+s,x+t]
     }
   }
-  graph<-filled.contour(x = 1:nrow(aresult),y = 1:ncol(aresult),
-                        z = aresult, color.palette = myPalette,
-                        plot.title = title(main = "Hotspot Spot-level Pattern ",
-                                           xlab = "x-coordinate",ylab = "y-coordinate"),
-                        plot.axes = {axis(1, seq(1, ncol(aresult), by = 5))
-                          axis(2, seq(1, nrow(aresult), by = 5))},
-                        key.title = title(main="Gene\n(counts)"),
-                        key.axes = axis(4, seq(min(aresult), max(aresult), by = 20)),
-  )
-  finalresult<-list(aresult,graph)
+  finalresult<-list(aresult)
   return(finalresult)
 }
-#example of kernal1
+#example of kernalv1
 k11<-kernalv1(20,30,60,2,1.1,1,10,20,4,5,65)
