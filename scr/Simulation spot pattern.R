@@ -7,10 +7,10 @@ myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
 #Hotspot：y1,y2:coordinates of index spot
 #2x-1:length of rectangular with pattern, x should be odd number. x-1 need to be divide by k.
 #k:thinkness of every layer
-#r:change rate
-#n: peak mean
+#r:change rate; the outer layer's mean is 1/r times of that of the adjacent inner layer
+#n: mean parameter of the negative binomial distribution of index spot
 #sz: size parameter in alternative parametrization of NB
-#l:length of background rect.
+#l:length of background
 kernal1<-function(y1,y2,x,k,r,n,sz,l){
   set.seed(104)
   aresult<-matrix(rep(0,(l^2)),nrow=l,ncol=l)
@@ -38,12 +38,14 @@ kernal1<-function(y1,y2,x,k,r,n,sz,l){
       }
     }
   }
+  #random generate number from negative binomial distribution where the mean parameter follows the pattern above
   generate<-function(s){
     g<-mean(rnbinom(30,mu=s,size=sz))
   }
   cresult<-sapply(result,generate)
   dresult<-matrix(cresult,nrow=2*x-1,ncol=2*x-1,byrow=T)
   
+  #re-locate the pattern part on background and calibrate it to the index location as defined
   aresult[y1,y2]<-dresult[x,x]
   for (i in (0:min(c((y1-1),(x-1))))){
     aresult[y1-i,y2]<-dresult[x-i,x]
@@ -63,6 +65,8 @@ kernal1<-function(y1,y2,x,k,r,n,sz,l){
       aresult[y1+s,y2+t]<-dresult[x+s,x+t]
     }
   }
+  
+  #draw the spot pattern
   graph<-filled.contour(x = 1:nrow(aresult),y = 1:ncol(aresult),
                  z = aresult, color.palette = myPalette,
                  plot.title = title(main = "Hotspot Spot-level Pattern ",
@@ -83,10 +87,10 @@ k11<-kernal1(20,30,60,2,1.1,250,7,65)
 #linear gradient spot-level pattern
 #y2:index column location
 #2y-1: length of pattern
-#r:change rate
+#r:change rate; the outer layer(column)'s mean is 1/r times of that of the adjacent inner layer(column)
+#n: mean of the negative binomial distribution of index column
 #k:thinkness of each layer
-#n:expected mean of gene counts of spot in index column
-#sz:size of NB
+#sz:size of NB, same as above
 #l: length of background
 kernal2<-function(y2,y,r,k,n,sz,l){
   set.seed(103)
@@ -129,6 +133,8 @@ kernal2<-function(y2,y,r,k,n,sz,l){
 k12<-kernal2(20,50,1.05,1,100,2,65)[2]
 
 #streak
+#same as linear gradient but mean of each column out of index band is constant
+#y1:y2: index columns location
 kernal3<-function(y1,y2,n,sz,l,base){
   result<-matrix(rep(0,l^2),nrow=l,ncol=l)
   result[,y1:y2]<-n
@@ -154,7 +160,7 @@ kernal3<-function(y1,y2,n,sz,l,base){
 k13<-kernal3(10,20,100,10,65,50)
 
 
-
+#move from spot-level to cell-level pattern.
 #Scenario 1: pattern on averge gene expression 
 kernalsvg<-function(y1,y2,x,k,r,n,l,num){
   set.seed(103)
@@ -184,18 +190,19 @@ kernalsvg<-function(y1,y2,x,k,r,n,l,num){
       }
     }
   }
-
+#random generate gene counts from Gamma-poisson distribution with the designed pattern
   generate2<-function(s){
     numb<-rpois(1,lambda=num)
     g<-sum(rpois(numb,lambda=rgamma(1,shape=s,scale=1)))
     return(list(numb,g))
   }
   cresult<-sapply(result,generate2)
-  #dresult is sum counts of each spot in pattern part
+  #dresult is sum of gene counts of each spot in pattern part
   dresult<-matrix(as.numeric(cresult[2,]),nrow=2*x-1,ncol=2*x-1,byrow=T)
   #nresult is cell number of each spot
   nresult<-matrix(as.numeric(cresult[1,]),nrow=2*x-1,ncol=2*x-1,byrow=T)
   
+ #re-locate the pattern part (of sum gene counts on spots) on background and calibrate it to the index location as defined
   aresult[y1,y2]<-dresult[x,x]
   for (i in (0:min(c((y1-1),(x-1))))){
     aresult[y1-i,y2]<-dresult[x-i,x]
@@ -236,7 +243,7 @@ kernalsvg<-function(y1,y2,x,k,r,n,l,num){
       numresult[y1+s,y2+t]<-nresult[x+s,x+t]
     }
   }
-#Pattern of Average gene expression  
+#Pattern of Average gene expression: divide sum of gene counts by the number of cells to get the average gene counts.  
   avreuslt<-aresult/numresult
   graph1<-filled.contour(x = 1:nrow(aresult),y = 1:ncol(aresult),
                         z = aresult, color.palette = myPalette,
@@ -268,4 +275,5 @@ kernalsvg<-function(y1,y2,x,k,r,n,l,num){
   finalresult<-list(graph1,graph2,graph3)
   return(finalresult)
 }
+#example
 kernal4<-kernalsvg(20,25,41,2,1.1,100,50,20)
