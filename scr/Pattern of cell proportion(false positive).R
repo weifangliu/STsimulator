@@ -1,4 +1,4 @@
-#Scenario 3:Spatial pattern driven by cell proportion
+#Scenario 3:Spatial pattern driven by cell proportion(false positive)
 library(scatterpie)
 kernalcp<-function(y1,y2,x,k,r,n1,l,ave1,ave2,base,sz){
   set.seed(103)
