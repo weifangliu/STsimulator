@@ -1,4 +1,6 @@
-#Scenario 2: spatial pattern driven by cell number
+#Scenario 2: spatial pattern driven by cell number(false positive)
+#ave: mean of negative binomial distribution across all spots.
+#n:index spot's mean of poisson distribution modeling cell number 
 kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
   set.seed(103)
   aresult<-matrix(rep(0,(l^2)),nrow=l,ncol=l)
@@ -27,7 +29,7 @@ kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
       }
     }
   }
-  
+#randam generate cell number following poission distribution with mean  
   generate2<-function(s){
     numb<-rpois(1,lambda=s)+1
     g<-sum(rnbinom(numb,mu=ave,size=sz))
