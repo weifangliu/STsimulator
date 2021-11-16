@@ -29,7 +29,9 @@ kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
       }
     }
   }
-#randam generate cell number following poission distribution with mean  
+#randam generate cell number from poission distribution where the mean follows the pattern above 
+#generate sum of gene counts on each spot from negative binomial distribution 
+
   generate2<-function(s){
     numb<-rpois(1,lambda=s)+1
     g<-sum(rnbinom(numb,mu=ave,size=sz))
@@ -82,7 +84,7 @@ kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
       tresult[y1+s,y2+t]<-dresult[x+s,x+t]
     }
   }
-  #Pattern of Average gene expression  
+  #Pattern of Average gene expression,the same as before  
   avreuslt<-tresult/aresult
   
   graph1<-filled.contour(x = 1:nrow(aresult),y = 1:ncol(aresult),
@@ -115,4 +117,5 @@ kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
   finalresult<-list(graph1,graph2,graph3)
   return(finalresult)
 }
+#example
 kernal5<-kernalcn(30,25,40,2,1.1,100,50,90,5,10)
