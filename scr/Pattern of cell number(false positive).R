@@ -120,7 +120,7 @@ kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
 #example
 kernal5<-kernalcn(30,25,40,2,1.1,100,50,90,5,10)
 
-#linear gradient pattern of cell number
+#linear gradient pattern driven by cell number
 #y2:index column location
 #2y-1: length of pattern
 #r:change rate
@@ -190,5 +190,48 @@ kernalcn2<-function(y2,y,k,r,n,l,ave,base,sz){
   finalresult<-list(graph1,graph2)
   return(finalresult)
 }
-#example of linear grdient pattern on cell number
+#example of linear grdient pattern driven by cell number
 kernalcn2(20,50,2,1.1,100,45,90,5,10)
+
+#streak pattern driven by cell number
+kernalcn3<-function(y1,y2,n,l,ave,base,sz){
+  result<-matrix(rep(0,l^2),nrow=l,ncol=l)
+  aresult<-matrix(rep(0,l^2),nrow=l,ncol=l)
+  tresult<-matrix(rnbinom(l^2,mu=ave,size=sz)*(rpois(l^2,base)+1),nrow=l,ncol=l)
+  result[,y1:y2]<-n
+  result[,0:y1]<-base
+  result[,y2:l]<-base
+  generate2<-function(s){
+    numb<-rpois(1,lambda=s)+1
+    g<-sum(rnbinom(numb,mu=ave,size=sz))
+    return(list(numb,g))
+  } 
+  cresult<-sapply(result,generate2)
+  aresult<-matrix(cresult,nrow=l,ncol=l,byrow=F)
+  #dresult is sum counts of each spot in pattern part
+  dresult<-matrix(as.numeric(cresult[2,]),nrow=l,ncol=l,byrow=F)
+  #nresult is cell number of each spot
+  nresult<-matrix(as.numeric(cresult[1,]),nrow=l,ncol=l,byrow=F)
+  graph1<-filled.contour(x = 1:nrow(t(result)),y = 1:ncol(t(nresult)),
+                         z = t(nresult), color.palette = myPalette,
+                         plot.title = title(main = "Distribution of Cell Number",
+                                            xlab = "x-coordinate",ylab = "y-coordinate"),
+                         plot.axes = {axis(1, seq(1, ncol(t(nresult)), by = 5))
+                           axis(2, seq(1, nrow(t(nresult)), by = 5))},
+                         key.title = title(main="Cell\n(number)"),
+                         key.axes = axis(4, seq(min(nresult), max(nresult), by = 10))
+                         ,)
+  graph2<-filled.contour(x = 1:nrow(t(dresult)),y = 1:ncol(t(dresult)),
+                         z = t(dresult), color.palette = myPalette,
+                         plot.title = title(main = "Pattern of Driven by Cell Number",
+                                            xlab = "x-coordinate",ylab = "y-coordinate"),
+                         plot.axes = {axis(1, seq(1, ncol(t(dresult)), by = 5))
+                           axis(2, seq(1, nrow(t(dresult)), by = 5))},
+                         key.title = title(main="Gene\n(counts)"),
+                         key.axes = axis(4, seq(min(dresult), max(dresult), by = 1000))
+                         ,)
+  finalresult<-list(graph1,graph2)
+  return(finalresult)
+}
+#example of streak pattern driven by cell number
+kernalcn3(10,30,100,40,90,5,10)
