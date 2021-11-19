@@ -119,3 +119,76 @@ kernalcn<-function(y1,y2,x,k,r,n,l,ave,base,sz){
 }
 #example
 kernal5<-kernalcn(30,25,40,2,1.1,100,50,90,5,10)
+
+#linear gradient pattern of cell number
+#y2:index column location
+#2y-1: length of pattern
+#r:change rate
+#k:thinkness of each layer
+#n:expected mean of gene counts of spot in index column
+#sz:size of NB
+#l: length of background
+kernalcn2<-function(y2,y,k,r,n,l,ave,base,sz){
+  set.seed(103)
+  result<-matrix(rep(0,l*((2*y)-1)),nrow=l,ncol=2*y-1)
+  aresult<-matrix(rep(0,l^2),nrow=l,ncol=l)
+  tresult<-matrix(rnbinom(l^2,mu=ave,size=sz)*(rpois(l^2,base)+1),nrow=l,ncol=l)
+  result[,y]<-n
+  for (t in (0:((y-1)/k-1))){
+    result[,y-(t+1)*k]<-(1/r)*result[,y-t*k]
+    result[,y+(t+1)*k]<-(1/r)*result[,y+t*k]
+    for (j in (0:(k-1))){
+      result[,y-(t*k)+j]<-result[,y-t*k]
+      result[,y+(t*k)-j]<-result[,y+t*k]
+    }
+  }
+  generate2<-function(s){
+    numb<-rpois(1,lambda=s)+1
+    g<-sum(rnbinom(numb,mu=ave,size=sz))
+    return(list(numb,g))
+  } 
+  cresult<-sapply(result,generate2)
+  #dresult is sum counts of each spot in pattern part
+  dresult<-matrix(as.numeric(cresult[2,]),nrow=l,ncol=(2*y)-1,byrow=F)
+  #nresult is cell number of each spot
+  nresult<-matrix(as.numeric(cresult[1,]),nrow=l,ncol=(2*y)-1,byrow=F)
+  #pattern on cell number  
+  aresult[,y2]<-nresult[,y]
+  for (i in (0:min(c(y-1,y2-1)))){
+    aresult[,y2-i]<-nresult[,y-i]
+  }
+  for (j in (0:min(c(l-y2,y-1)))){
+    aresult[,y2+j]<-nresult[,y+j]
+  }
+  #pattern on spot-level counts pattern 
+  tresult[,y2]<-dresult[,y]
+  for (i in (0:min(c(y-1,y2-1)))){
+    tresult[,y2-i]<-dresult[,y-i]
+  }
+  for (j in (0:min(c(l-y2,y-1)))){
+    tresult[,y2+j]<-dresult[,y+j]
+  }
+  #Pattern of Average gene expression  
+  graph1<-filled.contour(x = 1:nrow(t(aresult)),y = 1:ncol(t(aresult)),
+                         z = t(aresult), color.palette = myPalette,
+                         plot.title = title(main = "Distribution of Cell Number",
+                                            xlab = "x-coordinate",ylab = "y-coordinate"),
+                         plot.axes = {axis(1, seq(1, ncol(t(aresult)), by = 5))
+                           axis(2, seq(1, nrow(t(aresult)), by = 5))},
+                         key.title = title(main="Cell\n(number)"),
+                         key.axes = axis(4, seq(min(aresult), max(aresult), by = 10))
+                         ,)
+  graph2<-filled.contour(x = 1:nrow(t(tresult)),y = 1:ncol(t(tresult)),
+                         z = t(tresult), color.palette = myPalette,
+                         plot.title = title(main = "Pattern of Driven by Cell Number",
+                                            xlab = "x-coordinate",ylab = "y-coordinate"),
+                         plot.axes = {axis(1, seq(1, ncol(t(tresult)), by = 5))
+                           axis(2, seq(1, nrow(t(tresult)), by = 5))},
+                         key.title = title(main="Gene\n(counts)"),
+                         key.axes = axis(4, seq(min(tresult), max(tresult), by = 1000))
+                         ,)
+  finalresult<-list(graph1,graph2)
+  return(finalresult)
+}
+#example of linear grdient pattern on cell number
+kernalcn2(20,50,2,1.1,100,45,90,5,10)
