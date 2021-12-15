@@ -65,12 +65,12 @@ kernalcp<-function(y1,y2,x,k,r,n1,l,ave1,ave2,base,sz){
   cresult<-sapply(result*numresult,generate1)
   cresult2<-sapply(result2*numresult,generate2)
   
-  #dresult is sum counts of each spot in pattern part (cell type1)
+  #dresult is sum of gene counts of each spot in pattern part (cell type1)
   dresult<-matrix(as.numeric(cresult[2,]),nrow=2*x-1,ncol=2*x-1,byrow=T)
   #nresult is cell number of each spot (cell type1)
   nresult<-matrix(as.numeric(cresult[1,]),nrow=2*x-1,ncol=2*x-1,byrow=T)
   
-  #dresult2 is sum counts of each spot in pattern part (cell type2)
+  #dresult2 is sum of gene counts of each spot in pattern part (cell type2)
   dresult2<-matrix(as.numeric(cresult2[2,]),nrow=2*x-1,ncol=2*x-1,byrow=T)
   #nresult2 is cell number of each spot (cell type2)
   nresult2<-matrix(as.numeric(cresult2[1,]),nrow=2*x-1,ncol=2*x-1,byrow=T)
@@ -165,15 +165,15 @@ kernalcp<-function(y1,y2,x,k,r,n1,l,ave1,ave2,base,sz){
   tresultf<-tresult1+tresult2
   avresultf<-tresultf/(aresult1+aresult2)
     
-  graph1<-filled.contour(x = 1:nrow(tresultf),y = 1:ncol(tresultf),
-                         z = tresultf, color.palette = myPalette,
-                         plot.title = title(main = "Pattern Drive by Cell Proportion",
-                                            xlab = "x-coordinate",ylab = "y-coordinate"),
-                         plot.axes = {axis(1, seq(1, ncol(tresultf), by = 5))
-                           axis(2, seq(1, nrow(tresultf), by = 5))},
-                         key.title = title(main="Gene\n(counts)"),
-                         key.axes = axis(4, seq(min(tresultf), max(tresultf), by = 200))
-                         )
+#  graph1<-filled.contour(x = 1:nrow(tresultf),y = 1:ncol(tresultf),
+#                         z = tresultf, color.palette = myPalette,
+#                         plot.title = title(main = "Pattern Drive by Cell Proportion",
+#                                            xlab = "x-coordinate",ylab = "y-coordinate"),
+#                         plot.axes = {axis(1, seq(1, ncol(tresultf), by = 5))
+#                           axis(2, seq(1, nrow(tresultf), by = 5))},
+#                         key.title = title(main="Gene\n(counts)"),
+#                         key.axes = axis(4, seq(min(tresultf), max(tresultf), by = 200))
+#                        )
 
   # graph2<-filled.contour(x = 1:nrow(avresultf),y = 1:ncol(avresultf),
   #                        z = avresultf, color.palette = myPalette,
@@ -194,34 +194,12 @@ kernalcp<-function(y1,y2,x,k,r,n1,l,ave1,ave2,base,sz){
   cellnum$A <- k1
   cellnum$B <- k2
   cellnum$radius<- 0.31
-  colnames(cellnum)[3+(1:length(num))]<-letters[1:length(num)]
   
   p <- ggplot() + geom_scatterpie(aes(x=xaxis, y=yaxis, group=region, r=radius), data=cellnum,
                                   cols=LETTERS[1:2], color=NA) + coord_equal()
   p + geom_scatterpie_legend(cellnum$radius, x=0, y=0)
-  finalresult<-list(graph1,graph2,aresult1,aresult2)
+  finalresult<-list(p,aresult1,aresult2,tresult,avresultf)
   return(finalresult)
 }
-library(ggplot2)
+
 kernal6<-kernalcp(10,20,31,2,1.1,1,30,100,50,50,20)
-
-k1<-as.numeric(kernal6[[3]])
-k2<-as.numeric(kernal6[[4]])
-
-cellnum<-data.frame(xaxis=rep(1:30,30), yaxis=rep(1:30,each=30))
-n<-nrow(cellnum)
-cellnum$region <- factor(1:n)
-cellnum$A <- k1
-cellnum$B <- k2
-cellnum$radius<- 0.31
-colnames(cellnum)[2+(1:length(num))]<-letters[1:length(num)]
-
-p <- ggplot() + geom_scatterpie(aes(x=xaxis, y=yaxis, group=region, r=radius), data=cellnum,
-                                cols=LETTERS[1:2], color=NA) + coord_equal()
-p + geom_scatterpie_legend(cellnum$radius, x=0, y=0)
-
-library(ggplot2)
-cols = c("#90BFF9", "red")
-df <- data.frame(xval=c(1:100), yval=c(1:100))
-test.plot = ggplot(df, aes(x=xval, y=yval, colour=yval)) + scale_color_gradientn(colors = cols, guide = "colorbar")
-col.used = ggplot_build(test.plot)$data[[1]][,1]
