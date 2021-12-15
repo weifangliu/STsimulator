@@ -1,4 +1,13 @@
 #Scenario 3:Spatial pattern driven by cell proportion(false positive)
+#(y1, y2): cardinal spot location on whole map
+#(x,x): cardinal spot location on pattern area
+#k: thickness of layer
+#1/r: rate of chaneging between adjacent layer
+#n1: proportion of cell type A on cardial spot
+#l: length of background
+#ave1, ave2: mean of negative binomial distribution followed by cell type 1 and 2 cell's gene counts 
+#base: base cell number on spot level
+#sz: size parametet of NB distribution followed by cell type 1 and 2 (the same) cell's gene counts
 library(scatterpie)
 kernalcp<-function(y1,y2,x,k,r,n1,l,ave1,ave2,base,sz){
   set.seed(103)
