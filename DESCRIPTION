@@ -1,0 +1,14 @@
+Package: SoST
+Title: Simulator for Spatial Resolved Transcriptomics Data
+Version: 0.0.1
+Authors@R: 
+    person(given = "Zhentao",
+           family = "Yu",
+           role = c("aut", "cre"),
+           email = "first.last@example.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Simulator for Spatial Resolved Transcriptomics Data.
+License: `use_mit_license()`, `use_gpl3_license()` or friends to
+    pick a license
+Encoding: UTF-8
+LazyData: true
